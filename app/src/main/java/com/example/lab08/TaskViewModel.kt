@@ -33,23 +33,20 @@ class TaskViewModel(private val dao: TaskDao) : ViewModel() {
         viewModelScope.launch {
             val updatedTask = task.copy(isCompleted = !task.isCompleted)
             dao.updateTask(updatedTask)
-            _tasks.value = dao.getAllTasks() // Recargamos la lista
+            _tasks.value = dao.getAllTasks()
         }
     }
 
-    // Función para eliminar una tarea
     fun deleteTask(task: Task) {
         viewModelScope.launch {
             dao.deleteTask(task)
-            _tasks.value = dao.getAllTasks() // Recargamos la lista
+            _tasks.value = dao.getAllTasks()
         }
     }
-
-    // Función para eliminar todas las tareas
     fun deleteAllTasks() {
         viewModelScope.launch {
             dao.deleteAllTasks()
-            _tasks.value = emptyList() // Vaciamos la lista en el estado
+            _tasks.value = emptyList()
         }
     }
 }

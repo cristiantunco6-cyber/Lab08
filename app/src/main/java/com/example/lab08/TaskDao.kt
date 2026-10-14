@@ -12,15 +12,12 @@ interface TaskDao {
     // Obtener todas las tareas
     @Query("SELECT * FROM tasks")
     suspend fun getAllTasks(): List<Task>
-
     // Insertar una nueva tarea
     @Insert
     suspend fun insertTask(task: Task)
-
     // Marcar una tarea como completada o no completada
     @Update
     suspend fun updateTask(task: Task)
-
     // Eliminar una tarea
     @Delete
     suspend fun deleteTask(task: Task)
