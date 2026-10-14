@@ -58,7 +58,7 @@ class TaskViewModel(private val dao: TaskDao) : ViewModel() {
     fun deleteAllTasks() {
         viewModelScope.launch {
             dao.deleteAllTasks()
-            _tasks.value = emptyList() // Vaciamos la lista en el estado
+            _tasks.value = emptyList()
         }
     }
 

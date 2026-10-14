@@ -44,8 +44,16 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun TaskScreen(viewModel: TaskViewModel) {
     val tasks by viewModel.tasks.collectAsState()
+    val filter by viewModel.filter.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     var newTaskDescription by remember { mutableStateOf("") }
+
+    // Lista que se muestra según el filtro elegido
+    val visibleTasks = when (filter) {
+        TaskFilter.ALL -> tasks
+        TaskFilter.PENDING -> tasks.filter { !it.isCompleted }
+        TaskFilter.COMPLETED -> tasks.filter { it.isCompleted }
+    }
 
     Scaffold(
         topBar = {
@@ -57,29 +65,54 @@ fun TaskScreen(viewModel: TaskViewModel) {
             }
         }
     ) { innerPadding ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            items(tasks) { task ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Checkbox(
-                        checked = task.isCompleted,
-                        onCheckedChange = { viewModel.toggleTaskCompletion(task) }
-                    )
-                    Text(
-                        text = task.description,
-                        modifier = Modifier.weight(1f),
-                        textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None
-                    )
-                    IconButton(onClick = { viewModel.deleteTask(task) }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Eliminar tarea")
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilterChip(
+                    selected = filter == TaskFilter.ALL,
+                    onClick = { viewModel.setFilter(TaskFilter.ALL) },
+                    label = { Text("Todas") }
+                )
+                FilterChip(
+                    selected = filter == TaskFilter.PENDING,
+                    onClick = { viewModel.setFilter(TaskFilter.PENDING) },
+                    label = { Text("Pendientes") }
+                )
+                FilterChip(
+                    selected = filter == TaskFilter.COMPLETED,
+                    onClick = { viewModel.setFilter(TaskFilter.COMPLETED) },
+                    label = { Text("Completadas") }
+                )
+            }
+
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(visibleTasks) { task ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = task.isCompleted,
+                            onCheckedChange = { viewModel.toggleTaskCompletion(task) }
+                        )
+                        Text(
+                            text = task.description,
+                            modifier = Modifier.weight(1f),
+                            textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None
+                        )
+                        IconButton(onClick = { viewModel.deleteTask(task) }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Eliminar tarea")
+                        }
                     }
                 }
             }
